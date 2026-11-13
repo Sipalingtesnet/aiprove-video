@@ -8,7 +8,25 @@ Lane: PosterJudge — the poster picks the clearest.
 ## Entry
 
 `aiprove-explainer-60s.mp4` — **1280×720, 30 fps, H.264 + AAC, exactly 60.00 s,
-27,865,500 bytes**, sha256 to be recorded at submit time.
+34,206,357 bytes**, sha256
+`0943fc65abfe55df6f4127569822e82488f3879010e278b32cd34694b45f92a2`.
+
+## v2 fix (2026-11-14 ~01:37 WIB) — jitter + headline cropping
+
+The v1 render had visible Ken Burns micro-shaking (integer rounding in
+`zoompan` at low resolution) and the segment-2 "AIPROVE" headline sat at
+the frame edge. Fixed by re-rendering (`build_video_v2.py`):
+
+- Every still segment is pre-upscaled 6x with Lanczos
+  (`scale=7680:-1:flags=lanczos`) BEFORE `zoompan`, with deterministic
+  frame-index interpolation (`on/300`) and centered floating-point
+  coordinates, zoom range subtle 1.00 → 1.06.
+- Segment 2 starts at `z=1.0` (full uncropped frame) and zooms gently
+  1.00 → 1.05, so the full "AIPROVE" headline is visible from frame 1.
+- Segment 5 (terminal/rubric card) and the voiceover are unchanged;
+  1280×720, 30 fps, yuv420p, crf 18.
+- Verified: 5 consecutive frames 0.2 s apart (10.0–10.8 s) inspected —
+  "AIPROVE" fully visible in all 5, no pixel wobble between frames.
 
 Six 10-second segments, one per script beat:
 
